@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build": "esbuild index.tsx --bundle --minify --outfile=dist/index.js --loader:.tsx=tsx && cp index.html dist/index.html && echo '/* /index.html 200' > dist/_redirects"
+    "build": "esbuild index.tsx --bundle --minify --outfile=dist/index.js --loader:.tsx=tsx --define:process.env.API_KEY='\"'$API_KEY'\"' && cp index.html dist/index.html"
   },
   "dependencies": {
     "@google/genai": "^1.19.0",
