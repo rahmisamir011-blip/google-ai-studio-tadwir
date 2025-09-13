@@ -2,11 +2,19 @@ import { GoogleGenAI } from "@google/genai";
 import { getVisionPrompt, getLibraryPrompt } from '../constants';
 import type { AiResponse } from '../types';
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable is not set.");
+let ai: GoogleGenAI | null = null;
+export let geminiInitializationError: string | null = null;
+
+try {
+    if (!process.env.API_KEY) {
+        throw new Error("API_KEY environment variable is not set.");
+    }
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+} catch (e) {
+    geminiInitializationError = "فشل تهيئة مساعد الذكاء الاصطناعي. للمسؤول: الرجاء التأكد من إضافة مفتاح API (API_KEY) بشكل صحيح في إعدادات النشر.";
+    console.error(e);
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const fileToGenerativePart = (file: File): Promise<{ inlineData: { data: string; mimeType: string; }; }> => {
   return new Promise((resolve, reject) => {
@@ -93,17 +101,9 @@ const parseResponse = (responseText: string): AiResponse => {
     return response;
 };
 
-/**
- * A centralized error handler for Gemini API calls.
- * It ensures that any caught error is wrapped in a standard Error object
- * with a user-friendly message.
- * @param error The error caught in the catch block.
- * @returns An Error object.
- */
 const handleGeminiError = (error: unknown): Error => {
     console.error("Error communicating with Gemini API:", error);
     
-    // Check for rate limit errors first
     if (error instanceof Error && error.message.includes('429')) {
          return new Error("يوجد ضغط على الخدمة حالياً. الرجاء الانتظار قليلاً ثم المحاولة مرة أخرى.");
     }
@@ -120,6 +120,7 @@ const handleGeminiError = (error: unknown): Error => {
 
 
 export const analyzeImage = async (imageFile: File): Promise<AiResponse> => {
+    if (!ai) throw new Error(geminiInitializationError || "AI Service not initialized.");
     try {
         const imagePart = await fileToGenerativePart(imageFile);
         const textPart = { text: getVisionPrompt() };
@@ -130,7 +131,6 @@ export const analyzeImage = async (imageFile: File): Promise<AiResponse> => {
             config: { thinkingConfig: { thinkingBudget: 0 } },
         });
 
-        // Check for blocked responses or empty candidates, which indicates an issue.
         if (!response.candidates || response.candidates.length === 0) {
             const blockReason = response.promptFeedback?.blockReason;
             if (blockReason) {
@@ -151,6 +151,7 @@ export const analyzeImage = async (imageFile: File): Promise<AiResponse> => {
 };
 
 export const getLibraryInfo = async (query: string): Promise<AiResponse> => {
+    if (!ai) throw new Error(geminiInitializationError || "AI Service not initialized.");
     try {
         const prompt = getLibraryPrompt(query);
         const response = await ai.models.generateContent({
@@ -159,7 +160,6 @@ export const getLibraryInfo = async (query: string): Promise<AiResponse> => {
             config: { thinkingConfig: { thinkingBudget: 0 } },
         });
         
-        // Check for blocked responses or empty candidates.
         if (!response.candidates || response.candidates.length === 0) {
             const blockReason = response.promptFeedback?.blockReason;
             if (blockReason) {

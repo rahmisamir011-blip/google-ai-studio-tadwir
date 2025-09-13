@@ -1,24 +1,33 @@
-import { auth, db, GoogleAuthProvider, type User as FirebaseUser } from '../config/firebaseConfig';
+import { 
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    signOut,
+    GoogleAuthProvider,
+    type User as FirebaseUser
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig';
 import type { UserProfile } from '../types';
 import { FIRESTORE_COLLECTIONS } from '../constants';
 
 // --- Authentication Functions ---
 
 export const signUpWithEmail = (email: string, password: string) => {
-  return auth.createUserWithEmailAndPassword(email, password);
+  return createUserWithEmailAndPassword(auth, email, password);
 };
 
 export const signInWithEmail = (email: string, password: string) => {
-  return auth.signInWithEmailAndPassword(email, password);
+  return signInWithEmailAndPassword(auth, email, password);
 };
 
 export const signInWithGoogle = () => {
   const googleProvider = new GoogleAuthProvider();
-  return auth.signInWithPopup(googleProvider);
+  return signInWithPopup(auth, googleProvider);
 };
 
 export const signOutUser = () => {
-  return auth.signOut();
+  return signOut(auth);
 };
 
 
@@ -31,15 +40,15 @@ export const signOutUser = () => {
  */
 export const createUserProfile = async (user: FirebaseUser, additionalData: { name: string, dateOfBirth: string }) => {
     if (!user) return;
-    const userRef = db.collection(FIRESTORE_COLLECTIONS.USERS).doc(user.uid);
+    const userRef = doc(db, FIRESTORE_COLLECTIONS.USERS, user.uid);
     const profileData: UserProfile = {
         uid: user.uid,
         email: user.email,
         name: additionalData.name,
         dateOfBirth: additionalData.dateOfBirth,
     };
-    // Use set to create or overwrite the document for a given UID.
-    await userRef.set(profileData);
+    // Use setDoc to create or overwrite the document for a given UID.
+    await setDoc(userRef, profileData);
 };
 
 /**
@@ -49,10 +58,10 @@ export const createUserProfile = async (user: FirebaseUser, additionalData: { na
  */
 export const doesUserProfileExist = async (uid: string): Promise<boolean> => {
     if (!uid) return false;
-    const userRef = db.collection(FIRESTORE_COLLECTIONS.USERS).doc(uid);
+    const userRef = doc(db, FIRESTORE_COLLECTIONS.USERS, uid);
     try {
-        const docSnap = await userRef.get();
-        return docSnap.exists;
+        const docSnap = await getDoc(userRef);
+        return docSnap.exists();
     } catch (error) {
         console.error("Error checking user profile:", error);
         return false;

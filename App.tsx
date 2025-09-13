@@ -12,7 +12,7 @@ import { Toast } from './components/Toast';
 import { useAuth } from './hooks/useAuth';
 import { useAchievements } from './hooks/useAchievements';
 import { doesUserProfileExist, signOutUser } from './services/firebaseService';
-import { getLibraryInfo } from './services/geminiService';
+import { getLibraryInfo, geminiInitializationError } from './services/geminiService';
 import type { AiResponse } from './types';
 import { Tab } from './types';
 
@@ -110,7 +110,17 @@ const App: React.FC = () => {
         setVoiceSearchLoading(false);
     }
   };
-
+  
+  if (geminiInitializationError) {
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4 bg-red-50 text-red-800">
+            <div className="text-center bg-white/60 p-8 rounded-xl shadow-lg max-w-lg">
+                <h1 className="text-2xl font-bold mb-2">خطأ في الإعدادات</h1>
+                <p className="text-gray-700">{geminiInitializationError}</p>
+            </div>
+        </div>
+    );
+  }
 
   if (authLoading || checkingProfile) {
     return (
