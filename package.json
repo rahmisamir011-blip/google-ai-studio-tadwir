@@ -1,0 +1,16 @@
+{
+  "name": "tadwir",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild index.tsx --bundle --minify --outfile=dist/index.js --loader:.tsx=tsx && cp index.html dist/index.html && echo '/* /index.html 200' > dist/_redirects"
+  },
+  "dependencies": {
+    "@google/genai": "^1.19.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.0"
+  }
+}

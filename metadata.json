@@ -1,0 +1,8 @@
+{
+  "name": "تدوير - مساعد التدوير",
+  "description": "An elegant, AI-powered recycling assistant for Algerian households. Use your camera to identify items or search the library to get clear, step-by-step recycling instructions in Algerian Darija, all powered by the Gemini API.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

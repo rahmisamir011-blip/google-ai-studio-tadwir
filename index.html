@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تدوير - مساعد التدوير</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Load Firebase v8 Compat SDKs globally to ensure stability -->
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+      body {
+        font-family: 'Tajawal', sans-serif;
+      }
+
+      #background-animation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        background-color: #f0fdfa; /* A light emerald fallback */
+      }
+
+      #background-animation::before,
+      #background-animation::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.6;
+      }
+
+      #background-animation::before {
+        width: 400px;
+        height: 400px;
+        background: #34d399; /* emerald-400 */
+        top: -10%;
+        right: -10%;
+        animation: move-blob 15s infinite alternate ease-in-out;
+      }
+
+      #background-animation::after {
+        width: 300px;
+        height: 300px;
+        background: #a7f3d0; /* emerald-200 */
+        bottom: -5%;
+        left: 5%;
+        animation: move-blob 20s infinite alternate ease-in-out -5s; /* delayed start */
+      }
+
+      @keyframes move-blob {
+        0% {
+          transform: translate(0, 0) scale(1);
+        }
+        100% {
+          transform: translate(30px, -50px) scale(1.2);
+        }
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.2.1/"
+  }
+}
+</script>
+</head>
+  <body class="bg-white">
+    <div id="background-animation"></div>
+    <div id="root"></div>
+    <script defer src="/index.js"></script>
+  </body>
+</html>
